@@ -287,45 +287,45 @@ local RayfieldLibrary = {
 	Flags = {},
 	Theme = {
 		Default = {
-			TextColor = Color3.fromRGB(240, 235, 255),
+			TextColor = Color3.fromRGB(255, 255, 255),
 
-			Background = Color3.fromRGB(16, 14, 22),
-			Topbar = Color3.fromRGB(20, 18, 28),
-			Shadow = Color3.fromRGB(138, 43, 226),
+			Background = Color3.fromRGB(12, 12, 12),
+			Topbar = Color3.fromRGB(18, 18, 18),
+			Shadow = Color3.fromRGB(255, 0, 0),
 
-			NotificationBackground = Color3.fromRGB(20, 18, 28),
-			NotificationActionsBackground = Color3.fromRGB(26, 24, 35),
+			NotificationBackground = Color3.fromRGB(18, 18, 18),
+			NotificationActionsBackground = Color3.fromRGB(24, 24, 24),
 
-			TabBackground = Color3.fromRGB(24, 22, 32),
-			TabStroke = Color3.fromRGB(147, 51, 234),
-			TabBackgroundSelected = Color3.fromRGB(45, 30, 70),
-			TabTextColor = Color3.fromRGB(200, 190, 220),
-			SelectedTabTextColor = Color3.fromRGB(200, 150, 255),
+			TabBackground = Color3.fromRGB(22, 22, 22),
+			TabStroke = Color3.fromRGB(255, 0, 0),
+			TabBackgroundSelected = Color3.fromRGB(60, 10, 10),
+			TabTextColor = Color3.fromRGB(220, 220, 220),
+			SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
 
-			ElementBackground = Color3.fromRGB(22, 20, 30),
-			ElementBackgroundHover = Color3.fromRGB(28, 26, 38),
-			SecondaryElementBackground = Color3.fromRGB(20, 18, 28),
-			ElementStroke = Color3.fromRGB(147, 51, 234),
-			SecondaryElementStroke = Color3.fromRGB(120, 40, 200),
+			ElementBackground = Color3.fromRGB(20, 20, 20),
+			ElementBackgroundHover = Color3.fromRGB(28, 28, 28),
+			SecondaryElementBackground = Color3.fromRGB(18, 18, 18),
+			ElementStroke = Color3.fromRGB(255, 0, 0),
+			SecondaryElementStroke = Color3.fromRGB(220, 0, 0),
 
-			SliderBackground = Color3.fromRGB(24, 22, 32),
-			SliderProgress = Color3.fromRGB(147, 51, 234),
-			SliderStroke = Color3.fromRGB(168, 85, 247),
+			SliderBackground = Color3.fromRGB(22, 22, 22),
+			SliderProgress = Color3.fromRGB(255, 0, 0),
+			SliderStroke = Color3.fromRGB(255, 40, 40),
 
-			ToggleBackground = Color3.fromRGB(22, 20, 30),
-			ToggleEnabled = Color3.fromRGB(147, 51, 234),
-			ToggleDisabled = Color3.fromRGB(60, 55, 70),
-			ToggleEnabledStroke = Color3.fromRGB(168, 85, 247),
-			ToggleDisabledStroke = Color3.fromRGB(85, 80, 95),
-			ToggleEnabledOuterStroke = Color3.fromRGB(138, 43, 226),
-			ToggleDisabledOuterStroke = Color3.fromRGB(50, 45, 60),
+			ToggleBackground = Color3.fromRGB(20, 20, 20),
+			ToggleEnabled = Color3.fromRGB(255, 0, 0),
+			ToggleDisabled = Color3.fromRGB(60, 60, 60),
+			ToggleEnabledStroke = Color3.fromRGB(255, 50, 50),
+			ToggleDisabledStroke = Color3.fromRGB(85, 85, 85),
+			ToggleEnabledOuterStroke = Color3.fromRGB(255, 0, 0),
+			ToggleDisabledOuterStroke = Color3.fromRGB(50, 50, 50),
 
-			DropdownSelected = Color3.fromRGB(28, 26, 38),
-			DropdownUnselected = Color3.fromRGB(22, 20, 30),
+			DropdownSelected = Color3.fromRGB(28, 28, 28),
+			DropdownUnselected = Color3.fromRGB(20, 20, 20),
 
-			InputBackground = Color3.fromRGB(22, 20, 30),
-			InputStroke = Color3.fromRGB(147, 51, 234),
-			PlaceholderColor = Color3.fromRGB(160, 150, 180)
+			InputBackground = Color3.fromRGB(20, 20, 20),
+			InputStroke = Color3.fromRGB(255, 0, 0),
+			PlaceholderColor = Color3.fromRGB(180, 180, 180)
 		},
 
 		Ocean = {
@@ -817,7 +817,7 @@ local function ChangeTheme(Theme)
 			if Element.ClassName == "Frame" and Element.Name ~= "Placeholder" and Element.Name ~= "SectionSpacing" and Element.Name ~= "Divider" and Element.Name ~= "SectionTitle" and Element.Name ~= "SearchTitle-fsefsefesfsefesfesfThanks" then
 				Element.BackgroundColor3 = SelectedTheme.ElementBackground
 				Element.UIStroke.Color = SelectedTheme.ElementStroke
-				Element.UIStroke.Transparency = 0.15
+				Element.UIStroke.Transparency = 0
 			end
 		end
 	end
@@ -1180,12 +1180,12 @@ local function closeSearch()
 				TweenService:Create(tabbtn, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 				TweenService:Create(tabbtn.Image, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
 				TweenService:Create(tabbtn.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-				TweenService:Create(tabbtn.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.1}):Play()
+				TweenService:Create(tabbtn.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
 			else
 				TweenService:Create(tabbtn, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
 				TweenService:Create(tabbtn.Image, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
 				TweenService:Create(tabbtn.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
-				TweenService:Create(tabbtn.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.4}):Play()
+				TweenService:Create(tabbtn.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 0.2}):Play()
 			end
 		end
 	end
@@ -1283,7 +1283,7 @@ local function Maximise()
 	Topbar.ChangeSize.Image = "rbxassetid://"..10137941941
 
 	TweenService:Create(Topbar.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.35}):Play()
+	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.15}):Play()
 	TweenService:Create(Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7}):Play()
@@ -1349,7 +1349,7 @@ local function Unhide()
 	Main.Visible = true
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 750, 0, 500)}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 750, 0, 50)}):Play()
-	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.35}):Play()
+	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.15}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
