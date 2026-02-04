@@ -1,3 +1,15 @@
+--[[
+
+	Rayfield Interface Suite
+	by Sirius
+
+	shlex  | Designing + Programming
+	iRay   | Programming
+	Max    | Programming
+	Damian | Programming
+
+]]
+
 if debugX then
 	warn('Initialising Rayfield')
 end
@@ -277,50 +289,50 @@ local RayfieldLibrary = {
 		Default = {
 			TextColor = Color3.fromRGB(240, 240, 240),
 
-			Background = Color3.fromRGB(24, 24, 24),
-			Topbar = Color3.fromRGB(58, 0, 0),
-			Shadow = Color3.fromRGB(0, 0, 0),
+			Background = Color3.fromRGB(25, 25, 25),
+			Topbar = Color3.fromRGB(34, 34, 34),
+			Shadow = Color3.fromRGB(20, 20, 20),
 
-			NotificationBackground = Color3.fromRGB(255, 0, 0),
-			NotificationActionsBackground = Color3.fromRGB(255, 0, 0),
+			NotificationBackground = Color3.fromRGB(20, 20, 20),
+			NotificationActionsBackground = Color3.fromRGB(230, 230, 230),
 
-			TabBackground = Color3.fromRGB(255, 0, 0),
-			TabStroke = Color3.fromRGB(255, 255, 255),
-			TabBackgroundSelected = Color3.fromRGB(255, 0, 0),
-			TabTextColor = Color3.fromRGB(255, 0, 0),
-			SelectedTabTextColor = Color3.fromRGB(255, 0, 0),
+			TabBackground = Color3.fromRGB(80, 80, 80),
+			TabStroke = Color3.fromRGB(85, 85, 85),
+			TabBackgroundSelected = Color3.fromRGB(210, 210, 210),
+			TabTextColor = Color3.fromRGB(240, 240, 240),
+			SelectedTabTextColor = Color3.fromRGB(50, 50, 50),
 
-			ElementBackground = Color3.fromRGB(255, 0, 0),
-			ElementBackgroundHover = Color3.fromRGB(255, 0, 0),
-			SecondaryElementBackground = Color3.fromRGB(255, 0, 0),
-			ElementStroke = Color3.fromRGB(255, 0, 0),
-			SecondaryElementStroke = Color3.fromRGB(255, 0, 0),
+			ElementBackground = Color3.fromRGB(35, 35, 35),
+			ElementBackgroundHover = Color3.fromRGB(40, 40, 40),
+			SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
+			ElementStroke = Color3.fromRGB(50, 50, 50),
+			SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
 
-			SliderBackground = Color3.fromRGB(255, 0, 0),
-			SliderProgress = Color3.fromRGB(255, 0, 0),
-			SliderStroke = Color3.fromRGB(255, 0, 0),
+			SliderBackground = Color3.fromRGB(50, 138, 220),
+			SliderProgress = Color3.fromRGB(50, 138, 220),
+			SliderStroke = Color3.fromRGB(58, 163, 255),
 
-			ToggleBackground = Color3.fromRGB(255, 0, 0),
-			ToggleEnabled = Color3.fromRGB(255, 0, 0),
-			ToggleDisabled = Color3.fromRGB(255, 0, 0),
-			ToggleEnabledStroke = Color3.fromRGB(255, 0, 0),
-			ToggleDisabledStroke = Color3.fromRGB(255, 0, 0),
-			ToggleEnabledOuterStroke = Color3.fromRGB(255, 0, 0),
-			ToggleDisabledOuterStroke = Color3.fromRGB(255, 0, 0),
+			ToggleBackground = Color3.fromRGB(30, 30, 30),
+			ToggleEnabled = Color3.fromRGB(0, 146, 214),
+			ToggleDisabled = Color3.fromRGB(100, 100, 100),
+			ToggleEnabledStroke = Color3.fromRGB(0, 170, 255),
+			ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
+			ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
+			ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
 
-			DropdownSelected = Color3.fromRGB(255, 0, 0),
-			DropdownUnselected = Color3.fromRGB(255, 0, 0),
+			DropdownSelected = Color3.fromRGB(40, 40, 40),
+			DropdownUnselected = Color3.fromRGB(30, 30, 30),
 
-			InputBackground = Color3.fromRGB(255, 0, 0),
-			InputStroke = Color3.fromRGB(255, 0, 0),
-			PlaceholderColor = Color3.fromRGB(255, 0, 0)
+			InputBackground = Color3.fromRGB(30, 30, 30),
+			InputStroke = Color3.fromRGB(65, 65, 65),
+			PlaceholderColor = Color3.fromRGB(178, 178, 178)
 		},
 
 		Ocean = {
 			TextColor = Color3.fromRGB(230, 240, 240),
 
-			Background = Color3.fromRGB(42, 42, 42),
-			Topbar = Color3.fromRGB(40, 0, 0),
+			Background = Color3.fromRGB(20, 30, 30),
+			Topbar = Color3.fromRGB(25, 40, 40),
 			Shadow = Color3.fromRGB(15, 20, 20),
 
 			NotificationBackground = Color3.fromRGB(25, 35, 35),
@@ -361,14 +373,14 @@ local RayfieldLibrary = {
 		AmberGlow = {
 			TextColor = Color3.fromRGB(255, 245, 230),
 
-			Background = Color3.fromRGB(45, 0, 0),
-			Topbar = Color3.fromRGB(175, 0, 0),
-			Shadow = Color3.fromRGB(0, 0, 0),
+			Background = Color3.fromRGB(45, 30, 20),
+			Topbar = Color3.fromRGB(55, 40, 25),
+			Shadow = Color3.fromRGB(35, 25, 15),
 
 			NotificationBackground = Color3.fromRGB(50, 35, 25),
 			NotificationActionsBackground = Color3.fromRGB(245, 230, 215),
 
-			TabBackground = Color3.fromRGB(0, 0, 0),
+			TabBackground = Color3.fromRGB(75, 50, 35),
 			TabStroke = Color3.fromRGB(90, 60, 45),
 			TabBackgroundSelected = Color3.fromRGB(230, 180, 100),
 			TabTextColor = Color3.fromRGB(250, 220, 200),
