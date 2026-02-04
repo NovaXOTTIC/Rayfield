@@ -1582,15 +1582,183 @@ end
 
 
 function RayfieldLibrary:CreateWindow(Settings)
-	if Rayfield:FindFirstChild('Loading') then
-		if getgenv and not getgenv().rayfieldCached then
-			Rayfield.Enabled = true
-			Rayfield.Loading.Visible = true
+    if Rayfield:FindFirstChild('Loading') then
+        if getgenv and not getgenv().rayfieldCached then
+            Rayfield.Enabled = true
+            Rayfield.Loading.Visible = true
+            task.wait(1.4)
+            Rayfield.Loading.Visible = false
+        end
+    end
+    if getgenv then getgenv().rayfieldCached = true end
 
-			task.wait(1.4)
-			Rayfield.Loading.Visible = false
-		end
-	end
+    ensureFolder(RayfieldFolder)
+    local Passthrough = false
+    Topbar.Title.Text = Settings.Name
+
+    -- SIZE ADJUSTMENT: Set to 850x600 for a larger UI
+    Main.Size = UDim2.new(0, 850, 0, 600) 
+    Main.Visible = true
+    Main.BackgroundTransparency = 1
+    LoadingFrame.Title.Text = Settings.LoadingTitle or "Rayfield"
+    LoadingFrame.Subtitle.Text = Settings.LoadingSubtitle or "Interface Suite"
+
+    if Settings.Icon and Settings.Icon ~= 0 and Topbar:FindFirstChild('Icon') then
+        Topbar.Icon.Visible = true
+        Topbar.Title.Position = UDim2.new(0, 47, 0.5, 0)
+        if typeof(Settings.Icon) == 'string' and Icons then
+            local asset = getIcon(Settings.Icon)
+            Topbar.Icon.Image = 'rbxassetid://'..asset.id
+            Topbar.Icon.ImageRectOffset = asset.imageRectOffset
+            Topbar.Icon.ImageRectSize = asset.imageRectSize
+        else
+            Topbar.Icon.Image = getAssetUri(Settings.Icon)
+        end
+    end
+
+    -- Force the Red LED Theme
+    pcall(ChangeTheme, 'Default') 
+
+    Topbar.Visible = false
+    Elements.Visible = false
+    LoadingFrame.Visible = true
+    makeDraggable(Main, Topbar, false, {dragOffset, dragOffsetMobile})
+    
+    -- SIDE BUTTONS LOGIC: This section moves the Top Tabs to the Left Sidebar
+    task.spawn(function()
+        task.wait(0.1)
+        TabList.Size = UDim2.new(0, 180, 1, -50) 
+        TabList.Position = UDim2.new(0, 0, 0, 50) 
+        TabList.BackgroundColor3 = SelectedTheme.TabBackground 
+        
+        local layout = TabList:FindFirstChildWhichIsA("UIListLayout")
+        if layout then
+            layout.FillDirection = Enum.FillDirection.Vertical
+            layout.Padding = UDim.new(0, 5)
+            layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        end
+
+        Elements.Size = UDim2.new(1, -190, 1, -50) 
+        Elements.Position = UDim2.new(0, 190, 0, 50) 
+    end)
+    
+    Notifications.Template.Visible = false
+    Notifications.Visible = true
+    Rayfield.Enabled = true
+
+    task.wait(0.5)
+    TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+    TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
+    
+    TweenService:Create(LoadingFrame.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+    TweenService:Create(LoadingFrame.Subtitle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+    TweenService:Create(LoadingFrame.Version, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+
+    Elements.Template.LayoutOrder = 100000
+    Elements.Template.Visible = false
+    Elements.UIPageLayout.FillDirection = Enum.FillDirection.Horizontal
+    TabList.Template.Visible = false
+
+    local Window = {}
+    
+    function Window:CreateTab(Name, Image, Ext)
+        local TabButton = TabList.Template:Clone()
+        TabButton.Name = Name
+        TabButton.Title.Text = Name
+        TabButton.Parent = TabList
+        TabButton.Title.TextWrapped = true
+        TabButton.Size = UDim2.new(0, 160, 0, 35) 
+
+        if Image and Image ~= 0 then
+            if typeof(Image) == 'string' and Icons then
+                local asset = getIcon(Image)
+                TabButton.Image.Image = 'rbxassetid://'..asset.id
+                TabButton.Image.ImageRectOffset = asset.imageRectOffset
+                TabButton.Image.ImageRectSize = asset.imageRectSize
+            else
+                TabButton.Image.Image = getAssetUri(Image)
+            end
+            TabButton.Title.AnchorPoint = Vector2.new(0, 0.5)
+            TabButton.Title.Position = UDim2.new(0, 37, 0.5, 0)
+            TabButton.Image.Visible = true
+            TabButton.Title.TextXAlignment = Enum.TextXAlignment.Left
+        end
+
+        TabButton.BackgroundTransparency = 1
+        TabButton.Title.TextTransparency = 1
+        TabButton.Image.ImageTransparency = 1
+        TabButton.UIStroke.Transparency = 1
+        TabButton.Visible = not Ext or false
+
+        local TabPage = Elements.Template:Clone()
+        TabPage.Name = Name
+        TabPage.Visible = true
+        TabPage.LayoutOrder = #Elements:GetChildren() or Ext and 10000
+
+        for _, TemplateElement in ipairs(TabPage:GetChildren()) do
+            if TemplateElement.ClassName == "Frame" and TemplateElement.Name ~= "Placeholder" then
+                TemplateElement:Destroy()
+            end
+        end
+
+        TabPage.Parent = Elements
+        if not FirstTab and not Ext then
+            Elements.UIPageLayout.Animated = false
+            Elements.UIPageLayout:JumpTo(TabPage)
+            Elements.UIPageLayout.Animated = true
+            FirstTab = Name
+        end
+
+        TabButton.UIStroke.Color = SelectedTheme.TabStroke
+        if Elements.UIPageLayout.CurrentPage == TabPage then
+            TabButton.BackgroundColor3 = SelectedTheme.TabBackgroundSelected
+            TabButton.Image.ImageColor3 = SelectedTheme.SelectedTabTextColor
+            TabButton.Title.TextColor3 = SelectedTheme.SelectedTabTextColor
+        else
+            TabButton.BackgroundColor3 = SelectedTheme.TabBackground
+            TabButton.Image.ImageColor3 = SelectedTheme.TabTextColor
+            TabButton.Title.TextColor3 = SelectedTheme.TabTextColor
+        end
+
+        task.wait(0.1)
+        TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+        TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0.2}):Play()
+        TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.2}):Play()
+        TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 0.5}):Play()
+
+        TabButton.Interact.MouseButton1Click:Connect(function()
+            if Minimised then return end
+            TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+            TweenService:Create(TabButton.UIStroke, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+            TweenService:Create(TabButton.Title, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+            TweenService:Create(TabButton.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
+            TweenService:Create(TabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackgroundSelected}):Play()
+            
+            for _, OtherTabButton in ipairs(TabList:GetChildren()) do
+                if OtherTabButton.Name ~= "Template" and OtherTabButton.ClassName == "Frame" and OtherTabButton ~= TabButton and OtherTabButton.Name ~= "Placeholder" then
+                    TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.TabBackground}):Play()
+                    TweenService:Create(OtherTabButton, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
+                end
+            end
+            if Elements.UIPageLayout.CurrentPage ~= TabPage then
+                Elements.UIPageLayout:JumpTo(TabPage)
+            end
+        end)
+
+        local Tab = {}
+        -- [ KEEP YOUR ORIGINAL Tab:CreateButton, Tab:CreateSlider, etc. FUNCTIONS BELOW ]
+        return Tab
+    end
+
+    Elements.Visible = true
+    task.wait(1.1)
+    TweenService:Create(Main, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 850, 0, 600)}):Play() 
+    Topbar.Visible = true
+    TweenService:Create(Topbar, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+    TweenService:Create(Topbar.Divider, TweenInfo.new(1, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, 0, 0, 1)}):Play()
+
+    return Window
+end
 
 	if getgenv then getgenv().rayfieldCached = true end
 
@@ -2222,33 +2390,47 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 				if not opened then
 					opened = true 
-					TweenService:Create(Background, TweenInfo.new(0.45, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 18, 0, 15)}):Play()
-					task.wait(0.1)
-					TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 120)}):Play()
-					TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 173, 0, 86)}):Play()
-					TweenService:Create(Display, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-					TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.289, 0, 0.5, 0)}):Play()
-					TweenService:Create(ColorPicker.RGB, TweenInfo.new(0.8, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 40)}):Play()
-					TweenService:Create(ColorPicker.HexInput, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 73)}):Play()
-					TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0.574, 0, 1, 0)}):Play()
-					TweenService:Create(Main.MainPoint, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 0}):Play()
-					TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = SelectedTheme ~= RayfieldLibrary.Theme.Default and 0.25 or 0.1}):Play()
-					TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-				else
-					opened = false
-					TweenService:Create(ColorPicker, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 45)}):Play()
-					TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 39, 0, 22)}):Play()
-					TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-					TweenService:Create(ColorPicker.Interact, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-					TweenService:Create(ColorPicker.RGB, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 70)}):Play()
-					TweenService:Create(ColorPicker.HexInput, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Position = UDim2.new(0, 17, 0, 90)}):Play()
-					TweenService:Create(Display, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-					TweenService:Create(Main.MainPoint, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-					TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-					TweenService:Create(Background, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-				end
+Default = {
+			TextColor = Color3.fromRGB(255, 255, 255), -- White text
 
-			end)
+			Background = Color3.fromRGB(15, 15, 15),   -- Dark Gray/Black Background
+			Topbar = Color3.fromRGB(25, 25, 25),       -- Slightly lighter top
+			Shadow = Color3.fromRGB(255, 0, 0),        -- RED LED GLOW
+
+			NotificationBackground = Color3.fromRGB(20, 20, 20),
+			NotificationActionsBackground = Color3.fromRGB(255, 255, 255),
+
+			TabBackground = Color3.fromRGB(30, 30, 30),
+			TabStroke = Color3.fromRGB(255, 0, 0),     -- Red stroke on tabs
+			TabBackgroundSelected = Color3.fromRGB(255, 0, 0), -- Red when clicked
+			TabTextColor = Color3.fromRGB(255, 255, 255),
+			SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+
+			ElementBackground = Color3.fromRGB(35, 35, 35),
+			ElementBackgroundHover = Color3.fromRGB(40, 40, 40),
+			SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
+			ElementStroke = Color3.fromRGB(255, 0, 0), -- Red outline on buttons
+			SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
+
+			SliderBackground = Color3.fromRGB(50, 0, 0), -- Dark Red
+			SliderProgress = Color3.fromRGB(255, 0, 0),  -- BRIGHT RED Slider
+			SliderStroke = Color3.fromRGB(180, 0, 0),
+
+			ToggleBackground = Color3.fromRGB(30, 30, 30),
+			ToggleEnabled = Color3.fromRGB(255, 0, 0),   -- RED Toggle
+			ToggleDisabled = Color3.fromRGB(100, 100, 100),
+			ToggleEnabledStroke = Color3.fromRGB(255, 100, 100),
+			ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
+			ToggleEnabledOuterStroke = Color3.fromRGB(100, 0, 0),
+			ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
+
+			DropdownSelected = Color3.fromRGB(40, 40, 40),
+			DropdownUnselected = Color3.fromRGB(30, 30, 30),
+
+			InputBackground = Color3.fromRGB(30, 30, 30),
+			InputStroke = Color3.fromRGB(65, 65, 65),
+			PlaceholderColor = Color3.fromRGB(178, 178, 178)
+		},
 
 			UserInputService.InputEnded:Connect(function(input, gameProcessed) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
 					mainDragging = false
