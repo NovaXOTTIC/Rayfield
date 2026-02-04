@@ -290,7 +290,7 @@ local RayfieldLibrary = {
 			TextColor = Color3.fromRGB(255, 255, 255),
 
 			Background = Color3.fromRGB(15, 15, 15),
-			Topbar = Color3.fromRGB(20, 20, 20),
+			Topbar = Color3.fromRGB(25, 25, 25),
 			Shadow = Color3.fromRGB(255, 0, 0),
 
 			NotificationBackground = Color3.fromRGB(20, 20, 20),
@@ -298,7 +298,7 @@ local RayfieldLibrary = {
 
 			TabBackground = Color3.fromRGB(30, 30, 30),
 			TabStroke = Color3.fromRGB(255, 0, 0),
-			TabBackgroundSelected = Color3.fromRGB(40, 40, 40),
+			TabBackgroundSelected = Color3.fromRGB(40, 10, 10),
 			TabTextColor = Color3.fromRGB(255, 255, 255),
 			SelectedTabTextColor = Color3.fromRGB(255, 0, 0),
 
@@ -306,15 +306,15 @@ local RayfieldLibrary = {
 			ElementBackgroundHover = Color3.fromRGB(35, 35, 35),
 			SecondaryElementBackground = Color3.fromRGB(20, 20, 20),
 			ElementStroke = Color3.fromRGB(255, 0, 0),
-			SecondaryElementStroke = Color3.fromRGB(180, 0, 0),
+			SecondaryElementStroke = Color3.fromRGB(200, 0, 0),
 
 			SliderBackground = Color3.fromRGB(30, 30, 30),
 			SliderProgress = Color3.fromRGB(255, 0, 0),
-			SliderStroke = Color3.fromRGB(255, 0, 0),
+			SliderStroke = Color3.fromRGB(255, 50, 50),
 
 			ToggleBackground = Color3.fromRGB(25, 25, 25),
 			ToggleEnabled = Color3.fromRGB(255, 0, 0),
-			ToggleDisabled = Color3.fromRGB(80, 80, 80),
+			ToggleDisabled = Color3.fromRGB(60, 60, 60),
 			ToggleEnabledStroke = Color3.fromRGB(255, 50, 50),
 			ToggleDisabledStroke = Color3.fromRGB(100, 100, 100),
 			ToggleEnabledOuterStroke = Color3.fromRGB(255, 0, 0),
@@ -1286,7 +1286,7 @@ local function Maximise()
 	TweenService:Create(Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(dragBarCosmetic, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0.7}):Play()
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 700, 0, 600)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 700, 0, 450)}):Play()
 	TweenService:Create(Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 700, 0, 45)}):Play()
 	TabList.Visible = true
 	task.wait(0.2)
@@ -1346,7 +1346,7 @@ local function Unhide()
 	Debounce = true
 	Main.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Main.Visible = true
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 700, 0, 600)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 700, 0, 450)}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 700, 0, 45)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -1626,7 +1626,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	local Passthrough = false
 	Topbar.Title.Text = Settings.Name
 
-	Main.Size = UDim2.new(0, 580, 0, 140)
+	Main.Size = UDim2.new(0, 700, 0, 160)
 	Main.Visible = true
 	Main.BackgroundTransparency = 1
 	if Main:FindFirstChild('Notice') then Main.Notice.Visible = false end
