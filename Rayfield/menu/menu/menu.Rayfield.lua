@@ -169,16 +169,16 @@ local function loadSettings()
 			end
 
 
-			if file then
-				local success, decodedFile = pcall(function() return HttpService:JSONDecode(file) end)
-				if success then
-					file = decodedFile
-				else
-					file = {}
-				end
-			else
-				file = {}
-			end
+if file then
+    local success, decodedFile = pcall(function() return HttpService:JSONDecode(file) end)
+    if success then
+        file = decodedFile
+    else
+        file = {}
+    end
+else
+    file = {}
+end
 
 
 			if not settingsCreated then 
