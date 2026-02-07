@@ -919,7 +919,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		if TabButton.ClassName == "Frame" and TabButton.Name ~= "Placeholder" then
 			TabButton.BackgroundTransparency = 1
 			TabButton.Title.TextTransparency = 1
-			TabButton.Shadow.ImageTransparency = 1
+			TabButton.Shadow.ImageTransparency = 0
 			TabButton.Image.ImageTransparency = 1
 			TabButton.UIStroke.Transparency = 1
 		end
