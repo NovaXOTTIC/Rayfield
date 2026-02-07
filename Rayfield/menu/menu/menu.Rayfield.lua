@@ -510,7 +510,7 @@ function RayfieldLibrary:Notify(NotificationSettings)
 			game:GetService("Debris"):AddItem(script,0)
 		end
 
-		Notification.Actions.Template.Visible = true
+		Notification.Actions.Template.Visible = false
 
 		if NotificationSettings.Actions then
 			for _, Action in pairs(NotificationSettings.Actions) do
