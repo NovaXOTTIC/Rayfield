@@ -1792,7 +1792,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		if callSafely(isfile, RayfieldFolder.."/Key System".."/"..Settings.KeySettings.FileName..ConfigurationExtension) then
 			for _, MKey in ipairs(Settings.KeySettings.Key) do
 				local savedKeys = callSafely(readfile, RayfieldFolder.."/Key System".."/"..Settings.KeySettings.FileName..ConfigurationExtension)
-				if keyFileContents and string.find(savedKeys, MKey) then
+				if savedKeys and string.find(savedKeys, MKey) then
 					Passthrough = true
 				end
 			end
