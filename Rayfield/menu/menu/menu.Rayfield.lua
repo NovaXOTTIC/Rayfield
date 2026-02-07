@@ -101,7 +101,7 @@ local RayfieldLibrary = {
 		}
 	}
 }
-
+elseif syn and syn.protect_gui then
 
 
 -- Services
@@ -121,7 +121,7 @@ Rayfield.Enabled = false
 
 if gethui then
 	Rayfield.Parent = gethui()
-elseif syn.protect_gui then 
+elseif syn and syn.protect_gui then 
 	syn.protect_gui(Rayfield)
 	Rayfield.Parent = CoreGui
 elseif CoreGui:FindFirstChild("RobloxGui") then
@@ -997,7 +997,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			if gethui then
 				KeyUI.Parent = gethui()
-			elseif syn.protect_gui then
+			elseif syn and syn.protect_gui then
 				syn.protect_gui(Rayfield)
 				KeyUI.Parent = CoreGui
 			else
@@ -2003,7 +2003,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end)
 			Keybind.KeybindFrame.KeybindBox.FocusLost:Connect(function()
 				CheckingForKey = false
-				if Keybind.KeybindFrame.KeybindBox.Text == nil or "" then
+				if Keybind.KeybindFrame.KeybindBox.Text == nil or Keybind.KeybindFrame.KeybindBox.Text == "" then
 					Keybind.KeybindFrame.KeybindBox.Text = KeybindSettings.CurrentKeybind
 					SaveConfiguration()
 				end
