@@ -15,41 +15,12 @@ local ModernLib = {
 	Flags = {},
 	Themes = {
 		Default = {
-			-- Modern gradient-inspired colors
-			Main = Color3.fromRGB(18, 18, 24),
-			Second = Color3.fromRGB(24, 24, 32),
-			Accent = Color3.fromRGB(88, 101, 242), -- Discord-like purple
-			Stroke = Color3.fromRGB(45, 45, 55),
-			Divider = Color3.fromRGB(35, 35, 45),
-			Text = Color3.fromRGB(255, 255, 255),
-			TextDark = Color3.fromRGB(160, 160, 170),
-			Success = Color3.fromRGB(67, 181, 129),
-			Warning = Color3.fromRGB(250, 166, 26),
-			Error = Color3.fromRGB(237, 66, 69)
-		},
-		Dark = {
-			Main = Color3.fromRGB(15, 15, 15),
-			Second = Color3.fromRGB(20, 20, 20),
-			Accent = Color3.fromRGB(0, 150, 255),
-			Stroke = Color3.fromRGB(40, 40, 40),
-			Divider = Color3.fromRGB(30, 30, 30),
-			Text = Color3.fromRGB(240, 240, 240),
-			TextDark = Color3.fromRGB(140, 140, 140),
-			Success = Color3.fromRGB(60, 170, 120),
-			Warning = Color3.fromRGB(240, 160, 30),
-			Error = Color3.fromRGB(230, 60, 60)
-		},
-		Light = {
-			Main = Color3.fromRGB(240, 240, 245),
-			Second = Color3.fromRGB(250, 250, 255),
-			Accent = Color3.fromRGB(88, 101, 242),
-			Stroke = Color3.fromRGB(200, 200, 210),
-			Divider = Color3.fromRGB(220, 220, 230),
-			Text = Color3.fromRGB(20, 20, 30),
-			TextDark = Color3.fromRGB(100, 100, 110),
-			Success = Color3.fromRGB(67, 181, 129),
-			Warning = Color3.fromRGB(250, 166, 26),
-			Error = Color3.fromRGB(237, 66, 69)
+			Main = Color3.fromRGB(0, 0, 0),
+			Second = Color3.fromRGB(0, 0, 0),
+			Stroke = Color3.fromRGB(255, 0, 0),
+			Divider = Color3.fromRGB(255, 0, 0),
+			Text = Color3.fromRGB(255, 0, 0),
+			TextDark = Color3.fromRGB(0, 0, 0)
 		}
 	},
 	SelectedTheme = "Default",
