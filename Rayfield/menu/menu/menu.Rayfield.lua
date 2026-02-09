@@ -1,5 +1,5 @@
--- Modern Orion Library - Enhanced UI Framework
--- Improved animations, modern design, better performance
+-- Modern Orion Library - Enhanced UI Framework (FIXED)
+-- Bug fixes applied
 
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -20,7 +20,12 @@ local ModernLib = {
 			Stroke = Color3.fromRGB(255, 0, 0),
 			Divider = Color3.fromRGB(255, 0, 0),
 			Text = Color3.fromRGB(255, 0, 0),
-			TextDark = Color3.fromRGB(0, 0, 0)
+			TextDark = Color3.fromRGB(0, 0, 0),
+			-- BUG FIX #1: Added missing theme colors
+			Accent = Color3.fromRGB(255, 100, 100),
+			Success = Color3.fromRGB(100, 255, 100),
+			Warning = Color3.fromRGB(255, 200, 100),
+			Error = Color3.fromRGB(255, 100, 100)
 		}
 	},
 	SelectedTheme = "Default",
@@ -457,19 +462,34 @@ local function PackColor(Color)
 end
 
 local function UnpackColor(Color)
+	-- BUG FIX #2: Added validation for color data
+	if type(Color) ~= "table" or not Color.R or not Color.G or not Color.B then
+		return Color3.fromRGB(255, 255, 255) -- Default color
+	end
 	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
 local function LoadCfg(Config)
-	local Data = HttpService:JSONDecode(Config)
+	-- BUG FIX #3: Added pcall to handle corrupted configs
+	local Success, Data = pcall(function()
+		return HttpService:JSONDecode(Config)
+	end)
+	
+	if not Success then
+		warn("Failed to load config: Invalid JSON")
+		return
+	end
+	
 	for FlagName, FlagValue in pairs(Data) do
 		if ModernLib.Flags[FlagName] then
 			spawn(function()
-				if ModernLib.Flags[FlagName].Type == "Colorpicker" then
-					ModernLib.Flags[FlagName]:Set(UnpackColor(FlagValue))
-				else
-					ModernLib.Flags[FlagName]:Set(FlagValue)
-				end
+				pcall(function()
+					if ModernLib.Flags[FlagName].Type == "Colorpicker" then
+						ModernLib.Flags[FlagName]:Set(UnpackColor(FlagValue))
+					else
+						ModernLib.Flags[FlagName]:Set(FlagValue)
+					end
+				end)
 			end)
 		end
 	end
@@ -478,18 +498,21 @@ end
 local function SaveCfg(Name)
 	if not ModernLib.SaveCfg then return end
 	
-	local Data = {}
-	for FlagName, Flag in pairs(ModernLib.Flags) do
-		if Flag.Save then
-			if Flag.Type == "Colorpicker" then
-				Data[FlagName] = PackColor(Flag.Value)
-			else
-				Data[FlagName] = Flag.Value
+	-- BUG FIX #4: Added pcall for file operations
+	pcall(function()
+		local Data = {}
+		for FlagName, Flag in pairs(ModernLib.Flags) do
+			if Flag.Save then
+				if Flag.Type == "Colorpicker" then
+					Data[FlagName] = PackColor(Flag.Value)
+				else
+					Data[FlagName] = Flag.Value
+				end
 			end
 		end
-	end
-	
-	writefile(ModernLib.Folder .. "/" .. Name .. ".json", HttpService:JSONEncode(Data))
+		
+		writefile(ModernLib.Folder .. "/" .. Name .. ".json", HttpService:JSONEncode(Data))
+	end)
 end
 
 function ModernLib:Init()
@@ -596,9 +619,17 @@ function ModernLib:MakeWindow(Config)
 		})
 	})
 
-	AddThemeObject(TopBar:FindFirstChildOfClass("Frame"), "Divider")
-	AddThemeObject(TopBar:FindFirstChildOfClass("ImageLabel"), "Accent")
-	AddThemeObject(TopBar:FindFirstChildOfClass("TextLabel"), "Text")
+	-- BUG FIX #5: Get children properly instead of using NextSibling
+	local TopBarChildren = TopBar:GetChildren()
+	for _, child in ipairs(TopBarChildren) do
+		if child:IsA("Frame") and child.Size.Y.Offset == 1 then
+			AddThemeObject(child, "Divider")
+		elseif child:IsA("ImageLabel") then
+			AddThemeObject(child, "Accent")
+		elseif child:IsA("TextLabel") then
+			AddThemeObject(child, "Text")
+		end
+	end
 
 	-- Control buttons
 	local ControlsFrame = Create("Frame", {
@@ -616,7 +647,7 @@ function ModernLib:MakeWindow(Config)
 	})
 
 	AddThemeObject(ControlsFrame, "Second")
-	AddThemeObject(ControlsFrame.UIStroke, "Stroke")
+	AddThemeObject(ControlsFrame:FindFirstChildOfClass("UIStroke"), "Stroke")
 
 	-- Minimize button
 	local MinimizeBtn = Create("TextButton", {
@@ -635,7 +666,7 @@ function ModernLib:MakeWindow(Config)
 		})
 	})
 
-	AddThemeObject(MinimizeBtn.ImageLabel, "Text")
+	AddThemeObject(MinimizeBtn:FindFirstChildOfClass("ImageLabel"), "Text")
 
 	-- Close button
 	local CloseBtn = Create("TextButton", {
@@ -655,7 +686,7 @@ function ModernLib:MakeWindow(Config)
 		})
 	})
 
-	AddThemeObject(CloseBtn.ImageLabel, "Error")
+	AddThemeObject(CloseBtn:FindFirstChildOfClass("ImageLabel"), "Error")
 
 	-- Separator line
 	Create("Frame", {
@@ -689,8 +720,18 @@ function ModernLib:MakeWindow(Config)
 	})
 
 	AddThemeObject(Sidebar, "Second")
-	AddThemeObject(Sidebar:FindFirstChildOfClass("Frame"), "Second")
-	AddThemeObject(Sidebar:FindFirstChildOfClass("Frame").NextSibling, "Divider")
+	
+	-- BUG FIX #6: Get sidebar children properly
+	local SidebarChildren = Sidebar:GetChildren()
+	for _, child in ipairs(SidebarChildren) do
+		if child:IsA("Frame") then
+			if child.Size.X.Offset == 10 then
+				AddThemeObject(child, "Second")
+			elseif child.Size.X.Offset == 1 then
+				AddThemeObject(child, "Divider")
+			end
+		end
+	end
 
 	local TabHolder = Create("ScrollingFrame", {
 		Size = UDim2.new(1, 0, 1, -10),
@@ -738,12 +779,12 @@ function ModernLib:MakeWindow(Config)
 			TweenService:Create(MainWindow, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
 				Size = UDim2.new(0, MainWindow.Size.X.Offset, 0, 50)
 			}):Play()
-			MinimizeBtn.ImageLabel.Image = GetIcon("plus") or ""
+			MinimizeBtn:FindFirstChildOfClass("ImageLabel").Image = GetIcon("plus") or ""
 		else
 			TweenService:Create(MainWindow, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
 				Size = UDim2.new(0, Config.Size[1], 0, Config.Size[2])
 			}):Play()
-			MinimizeBtn.ImageLabel.Image = GetIcon("minus") or ""
+			MinimizeBtn:FindFirstChildOfClass("ImageLabel").Image = GetIcon("minus") or ""
 		end
 	end)
 
@@ -793,17 +834,17 @@ function ModernLib:MakeWindow(Config)
 				BackgroundTransparency = 0
 			}):Play()
 			
-			TweenService:Create(IntroFrame.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
 				Transparency = 0.3
 			}):Play()
 			
-			TweenService:Create(IntroFrame.ImageLabel, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("ImageLabel"), TweenInfo.new(0.6, Enum.EasingStyle.Quint), {
 				ImageTransparency = 0
 			}):Play()
 			
 			wait(0.3)
 			
-			TweenService:Create(IntroFrame.TextLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("TextLabel"), TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
 				TextTransparency = 0
 			}):Play()
 			
@@ -814,15 +855,15 @@ function ModernLib:MakeWindow(Config)
 				BackgroundTransparency = 1
 			}):Play()
 			
-			TweenService:Create(IntroFrame.UIStroke, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
 				Transparency = 1
 			}):Play()
 			
-			TweenService:Create(IntroFrame.ImageLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("ImageLabel"), TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
 				ImageTransparency = 1
 			}):Play()
 			
-			TweenService:Create(IntroFrame.TextLabel, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+			TweenService:Create(IntroFrame:FindFirstChildOfClass("TextLabel"), TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
 				TextTransparency = 1
 			}):Play()
 			
@@ -879,8 +920,8 @@ function ModernLib:MakeWindow(Config)
 			})
 		})
 
-		AddThemeObject(TabButton.ImageLabel, "TextDark")
-		AddThemeObject(TabButton.TextLabel, "TextDark")
+		AddThemeObject(TabButton:FindFirstChildOfClass("ImageLabel"), "TextDark")
+		AddThemeObject(TabButton:FindFirstChildOfClass("TextLabel"), "TextDark")
 
 		-- Create content container
 		local TabContent = Create("ScrollingFrame", {
@@ -908,14 +949,14 @@ function ModernLib:MakeWindow(Config)
 		if FirstTab then
 			FirstTab = false
 			TabButton.BackgroundTransparency = 0
-			TabButton.ImageLabel.ImageColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Accent
-			TabButton.TextLabel.TextColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Text
-			TabButton.TextLabel.Font = Enum.Font.GothamBold
+			TabButton:FindFirstChildOfClass("ImageLabel").ImageColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Accent
+			TabButton:FindFirstChildOfClass("TextLabel").TextColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Text
+			TabButton:FindFirstChildOfClass("TextLabel").Font = Enum.Font.GothamBold
 			TabContent.Visible = true
 			
 			AddThemeObject(TabButton, "Accent")
-			AddThemeObject(TabButton.ImageLabel, "Accent")
-			AddThemeObject(TabButton.TextLabel, "Text")
+			AddThemeObject(TabButton:FindFirstChildOfClass("ImageLabel"), "Accent")
+			AddThemeObject(TabButton:FindFirstChildOfClass("TextLabel"), "Text")
 		end
 
 		-- Tab switching
@@ -926,13 +967,22 @@ function ModernLib:MakeWindow(Config)
 					TweenService:Create(Tab, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
 						BackgroundTransparency = 1
 					}):Play()
-					TweenService:Create(Tab.ImageLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-						ImageColor3 = ModernLib.Themes[ModernLib.SelectedTheme].TextDark
-					}):Play()
-					TweenService:Create(Tab.TextLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-						TextColor3 = ModernLib.Themes[ModernLib.SelectedTheme].TextDark
-					}):Play()
-					Tab.TextLabel.Font = Enum.Font.GothamMedium
+					
+					-- BUG FIX #7: Check if ImageLabel exists
+					local TabIcon = Tab:FindFirstChildOfClass("ImageLabel")
+					if TabIcon then
+						TweenService:Create(TabIcon, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+							ImageColor3 = ModernLib.Themes[ModernLib.SelectedTheme].TextDark
+						}):Play()
+					end
+					
+					local TabLabel = Tab:FindFirstChildOfClass("TextLabel")
+					if TabLabel then
+						TweenService:Create(TabLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+							TextColor3 = ModernLib.Themes[ModernLib.SelectedTheme].TextDark
+						}):Play()
+						TabLabel.Font = Enum.Font.GothamMedium
+					end
 				end
 			end
 
@@ -947,13 +997,13 @@ function ModernLib:MakeWindow(Config)
 			TweenService:Create(TabButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
 				BackgroundTransparency = 0
 			}):Play()
-			TweenService:Create(TabButton.ImageLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+			TweenService:Create(TabButton:FindFirstChildOfClass("ImageLabel"), TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
 				ImageColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Accent
 			}):Play()
-			TweenService:Create(TabButton.TextLabel, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+			TweenService:Create(TabButton:FindFirstChildOfClass("TextLabel"), TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
 				TextColor3 = ModernLib.Themes[ModernLib.SelectedTheme].Text
 			}):Play()
-			TabButton.TextLabel.Font = Enum.Font.GothamBold
+			TabButton:FindFirstChildOfClass("TextLabel").Font = Enum.Font.GothamBold
 			TabContent.Visible = true
 		end)
 
@@ -1009,10 +1059,29 @@ function ModernLib:MakeWindow(Config)
 				})
 			})
 
-			AddThemeObject(SectionFrame.TextLabel, "Text")
-			AddThemeObject(SectionFrame.Frame, "Accent")
+			AddThemeObject(SectionFrame:FindFirstChildOfClass("TextLabel"), "Text")
+			
+			-- BUG FIX #8: Get children properly for section
+			local SectionChildren = SectionFrame:GetChildren()
+			for _, child in ipairs(SectionChildren) do
+				if child:IsA("Frame") and child.Size.Y.Offset == 2 then
+					AddThemeObject(child, "Accent")
+					break
+				end
+			end
 
-			local SectionContent = SectionFrame.Frame.NextSibling
+			local SectionContent = nil
+			for _, child in ipairs(SectionChildren) do
+				if child:IsA("Frame") and child:FindFirstChildOfClass("UIListLayout") then
+					SectionContent = child
+					break
+				end
+			end
+			
+			if not SectionContent then
+				warn("Could not find SectionContent")
+				return {}
+			end
 			
 			SectionContent:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 				SectionFrame.Size = UDim2.new(1, 0, 0, SectionContent.UIListLayout.AbsoluteContentSize.Y + 40)
@@ -1036,7 +1105,9 @@ function ModernLib:MakeWindow(Config)
 					MakeElement("Corner", 0, 8),
 					Create("UIStroke", {
 						Color = ModernLib.Themes[ModernLib.SelectedTheme].Stroke,
-						Thickness = 1
+						Thickness = 1,
+						-- BUG FIX #9: Set initial transparency
+						Transparency = 0.5
 					}),
 					Create("TextLabel", {
 						Size = UDim2.new(1, -20, 1, 0),
@@ -1059,18 +1130,18 @@ function ModernLib:MakeWindow(Config)
 				})
 
 				AddThemeObject(ButtonFrame, "Second")
-				AddThemeObject(ButtonFrame.UIStroke, "Stroke")
-				AddThemeObject(ButtonFrame.TextLabel, "Text")
-				AddThemeObject(ButtonFrame.ImageLabel, "Accent")
+				AddThemeObject(ButtonFrame:FindFirstChildOfClass("UIStroke"), "Stroke")
+				AddThemeObject(ButtonFrame:FindFirstChildOfClass("TextLabel"), "Text")
+				AddThemeObject(ButtonFrame:FindFirstChildOfClass("ImageLabel"), "Accent")
 
 				ButtonFrame.MouseEnter:Connect(function()
-					TweenService:Create(ButtonFrame.UIStroke, TweenInfo.new(0.2), {
+					TweenService:Create(ButtonFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
 						Transparency = 0
 					}):Play()
 				end)
 
 				ButtonFrame.MouseLeave:Connect(function()
-					TweenService:Create(ButtonFrame.UIStroke, TweenInfo.new(0.2), {
+					TweenService:Create(ButtonFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
 						Transparency = 0.5
 					}):Play()
 				end)
@@ -1088,13 +1159,13 @@ function ModernLib:MakeWindow(Config)
 					}):Play()
 					
 					spawn(function()
-						ButtonConfig.Callback()
+						pcall(ButtonConfig.Callback)
 					end)
 				end)
 
 				return {
 					Set = function(self, NewText)
-						ButtonFrame.TextLabel.Text = NewText
+						ButtonFrame:FindFirstChildOfClass("TextLabel").Text = NewText
 					end
 				}
 			end
@@ -1124,7 +1195,9 @@ function ModernLib:MakeWindow(Config)
 					MakeElement("Corner", 0, 8),
 					Create("UIStroke", {
 						Color = ModernLib.Themes[ModernLib.SelectedTheme].Stroke,
-						Thickness = 1
+						Thickness = 1,
+						-- BUG FIX #10: Set initial transparency
+						Transparency = 0.5
 					}),
 					Create("TextLabel", {
 						Size = UDim2.new(1, -60, 1, 0),
@@ -1156,11 +1229,11 @@ function ModernLib:MakeWindow(Config)
 				})
 
 				AddThemeObject(ToggleFrame, "Second")
-				AddThemeObject(ToggleFrame.UIStroke, "Stroke")
-				AddThemeObject(ToggleFrame.TextLabel, "Text")
+				AddThemeObject(ToggleFrame:FindFirstChildOfClass("UIStroke"), "Stroke")
+				AddThemeObject(ToggleFrame:FindFirstChildOfClass("TextLabel"), "Text")
 				
-				local Switch = ToggleFrame.Frame
-				local Knob = Switch.Frame
+				local Switch = ToggleFrame:FindFirstChildOfClass("Frame")
+				local Knob = Switch:FindFirstChildOfClass("Frame")
 
 				function Toggle:Set(Value)
 					Toggle.Value = Value
@@ -1181,7 +1254,7 @@ function ModernLib:MakeWindow(Config)
 						}):Play()
 					end
 					
-					ToggleConfig.Callback(Value)
+					pcall(ToggleConfig.Callback, Value)
 					
 					if ToggleConfig.Save then
 						SaveCfg(game.GameId)
@@ -1195,13 +1268,13 @@ function ModernLib:MakeWindow(Config)
 				end)
 
 				ToggleFrame.MouseEnter:Connect(function()
-					TweenService:Create(ToggleFrame.UIStroke, TweenInfo.new(0.2), {
+					TweenService:Create(ToggleFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
 						Transparency = 0
 					}):Play()
 				end)
 
 				ToggleFrame.MouseLeave:Connect(function()
-					TweenService:Create(ToggleFrame.UIStroke, TweenInfo.new(0.2), {
+					TweenService:Create(ToggleFrame:FindFirstChildOfClass("UIStroke"), TweenInfo.new(0.2), {
 						Transparency = 0.5
 					}):Play()
 				end)
@@ -1241,7 +1314,9 @@ function ModernLib:MakeWindow(Config)
 					MakeElement("Corner", 0, 8),
 					Create("UIStroke", {
 						Color = ModernLib.Themes[ModernLib.SelectedTheme].Stroke,
-						Thickness = 1
+						Thickness = 1,
+						-- BUG FIX #11: Set initial transparency
+						Transparency = 0.5
 					}),
 					Create("TextLabel", {
 						Size = UDim2.new(1, -20, 0, 20),
@@ -1281,13 +1356,37 @@ function ModernLib:MakeWindow(Config)
 				})
 
 				AddThemeObject(SliderFrame, "Second")
-				AddThemeObject(SliderFrame.UIStroke, "Stroke")
-				AddThemeObject(SliderFrame:FindFirstChildOfClass("TextLabel"), "Text")
-				AddThemeObject(SliderFrame:FindFirstChildOfClass("TextLabel").NextSibling, "Accent")
+				AddThemeObject(SliderFrame:FindFirstChildOfClass("UIStroke"), "Stroke")
 				
-				local Track = SliderFrame.Frame
-				local Fill = Track.Frame
-				local ValueLabel = SliderFrame:FindFirstChildOfClass("TextLabel").NextSibling
+				-- BUG FIX #12: Get labels properly
+				local NameLabel = nil
+				local ValueLabel = nil
+				for _, child in ipairs(SliderFrame:GetChildren()) do
+					if child:IsA("TextLabel") then
+						if child.Position.X.Offset == 15 then
+							NameLabel = child
+							AddThemeObject(NameLabel, "Text")
+						else
+							ValueLabel = child
+							AddThemeObject(ValueLabel, "Accent")
+						end
+					end
+				end
+				
+				local Track = nil
+				local Fill = nil
+				for _, child in ipairs(SliderFrame:GetChildren()) do
+					if child:IsA("Frame") and child:FindFirstChildOfClass("UICorner") then
+						Track = child
+						Fill = Track:FindFirstChildOfClass("Frame")
+						break
+					end
+				end
+
+				if not Track or not Fill or not ValueLabel then
+					warn("Could not find slider components")
+					return {}
+				end
 
 				AddThemeObject(Track, "Divider")
 				AddThemeObject(Fill, "Accent")
@@ -1303,7 +1402,7 @@ function ModernLib:MakeWindow(Config)
 					
 					ValueLabel.Text = tostring(self.Value)
 					
-					SliderConfig.Callback(self.Value)
+					pcall(SliderConfig.Callback, self.Value)
 					
 					if SliderConfig.Save then
 						SaveCfg(game.GameId)
